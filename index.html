@@ -37,38 +37,32 @@ Parse “du_stats_XXX.txt” multi-UE (Each_Tput_Time) => https://dustinchen26.g
         }
 
         /* 將UE-ID文字設為綠色 */
-        #output span.ue-id {
+        #output .ue-id {
             color: green;
         }
 
-        #output span.dl-tpt {
+        #output .dl-tpt {
             color: blue;
         }
 
-        #output span.dl-bler {
-            color: blue;
+        #output .dl-bler {
+            color: blue !important; /* 使用 !important 确保样式被应用 */
         }
-		
-        #output span.dl-bler-percent {
-            color: blue;
+
+        #output .dl-bler-percent {
+            color: blue !important; /* 使用 !important 确保样式被应用 */
         }
-		
-        #output span.ul-tpt {
+
+        #output .ul-tpt {
             color: red;
         }
 
-        #output span.ul-bler {
-            color: red;
+        #output .ul-bler {
+            color: red !important; /* 使用 !important 确保样式被应用 */
         }
-		
-        #output span.ul-bler-percent {
-            color: red;
-        }
-		
-        /* Added style for buttons */
-        button {
-            font-size: 13px;
-            /* Adjust the font size as needed */
+
+        #output .ul-bler-percent {
+            color: red !important; /* 使用 !important 确保样式被应用 */
         }
     </style>
     <script>
@@ -116,6 +110,14 @@ Parse “du_stats_XXX.txt” multi-UE (Each_Tput_Time) => https://dustinchen26.g
 
             // 將結果添加到HTML中
             document.getElementById('output').innerHTML = output;
+            
+            // 創建一個隱藏的 div 元素來保留顏色，並且將文本節點複製到這個隱藏的 div 中
+            var hiddenDiv = document.createElement('div');
+            hiddenDiv.style.display = 'none';
+            hiddenDiv.appendChild(document.getElementById('output').cloneNode(true));
+            // 從隱藏的 div 中獲取純文本內容，並將其下載到 output.txt 文件中
+            var plainText = hiddenDiv.innerText;
+            downloadTxtFile(plainText);
         }
 
         function parseUEData(lines, index) {
@@ -149,7 +151,7 @@ Parse “du_stats_XXX.txt” multi-UE (Each_Tput_Time) => https://dustinchen26.g
                     dlTpt = values[5].padEnd(8);
                     ulTpt = values[7].padEnd(8);
                     output += "<span class='ue-id'>UE-ID=" + ueId + "</span><span class='dl-tpt'>DL-TPT=" + dlTpt +
-                        "</span>  <span class='ul-tpt'>UL-TPT=" + ulTpt + "</span>\n";
+                        "</span><span class='ul-tpt'>UL-TPT=" + ulTpt + "</span>\n";
                 }
 
                 // 繼續處理下一行
@@ -175,7 +177,7 @@ Parse “du_stats_XXX.txt” multi-UE (Each_Tput_Time) => https://dustinchen26.g
             } catch (error) {
                 var dl_bler = "NaN".padEnd(8);
             }
-			var dl_bler_percent = values[7].padEnd(8);
+            var dl_bler_percent = values[7].padEnd(8);
             var dlMcs = values[13].padEnd(8);
             var ulCrcSucc = values[18].padEnd(8);
             var ulCrcFail = values[19].padEnd(8);
@@ -187,14 +189,14 @@ Parse “du_stats_XXX.txt” multi-UE (Each_Tput_Time) => https://dustinchen26.g
             } catch (error) {
                 var ul_bler = "NaN".padEnd(8);
             }
-			var ul_bler_percent = values[31].padEnd(8);
+            var ul_bler_percent = values[31].padEnd(8);
             var ulMcs = values[22].padEnd(8);
 
             // 返回結果字符串
             output += "<span class='ue-id'>UE-ID=" + ueId + "</span>ACK-TB[0]=" + ACK_TB0 + "NACK-TB[0]=" + NACK_TB0 +
-                "<span class='dl-bler'>DL-BLER=" + dl_bler + "</span><span class='dl-bler-percent'>DL-BLER-percent=" + dl_bler_percent +"</span>DL-MCS=" +
+                "<span class='dl-bler'>DL-BLER=" + dl_bler + "</span><span class='dl-bler-percent'>DL-BLER-percent=" + dl_bler_percent + "</span>DL-MCS=" +
                 dlMcs +
-                "UL-CRC-SUCC=" + ulCrcSucc + "UL-CRC-FAIL=" + ulCrcFail + "<span class='ul-bler'>UL-BLER=" + ul_bler + "</span><span class='ul-bler-percent'>UL-BLER-percent=" + ul_bler_percent+
+                "UL-CRC-SUCC=" + ulCrcSucc + "UL-CRC-FAIL=" + ulCrcFail + "<span class='ul-bler'>UL-BLER=" + ul_bler + "</span><span class='ul-bler-percent'>UL-BLER-percent=" + ul_bler_percent +
                 "</span>UL-MCS=" + ulMcs +
                 "\n";
 
@@ -213,7 +215,7 @@ Parse “du_stats_XXX.txt” multi-UE (Each_Tput_Time) => https://dustinchen26.g
                 } catch (error) {
                     var dl_bler = "NaN".padEnd(8);
                 }
-				var dl_bler_percent = values[7].padEnd(8);
+                var dl_bler_percent = values[7].padEnd(8);
                 dlMcs = values[13].padEnd(8);
                 ulCrcSucc = values[18].padEnd(8);
                 ulCrcFail = values[19].padEnd(8);
@@ -225,18 +227,32 @@ Parse “du_stats_XXX.txt” multi-UE (Each_Tput_Time) => https://dustinchen26.g
                 } catch (error) {
                     var ul_bler = "NaN".padEnd(8);
                 }
-				var ul_bler_percent = values[31].padEnd(8);
+                var ul_bler_percent = values[31].padEnd(8);
                 ulMcs = values[22].padEnd(8);
                 output += "<span class='ue-id'>UE-ID=" + ueId + "</span>ACK-TB[0]=" + ACK_TB0 + "NACK-TB[0]=" + NACK_TB0 +
-                    "<span class='dl-bler'>DL-BLER=" + dl_bler + "</span><span class='dl-bler-percent'>DL-BLER-percent=" + dl_bler_percent+ "</span>DL-MCS=" +
+                    "<span class='dl-bler'>DL-BLER=" + dl_bler + "</span><span class='dl-bler-percent'>DL-BLER-percent=" + dl_bler_percent + "</span>DL-MCS=" +
                     dlMcs +
-                    "UL-CRC-SUCC=" + ulCrcSucc + "UL-CRC-FAIL=" + ulCrcFail + "<span class='ul-bler'>UL-BLER=" + ul_bler + "</span><span class='ul-bler-percent'>UL-BLER-percent=" + ul_bler_percent+
-                     "</span>UL-MCS=" + ulMcs +
+                    "UL-CRC-SUCC=" + ulCrcSucc + "UL-CRC-FAIL=" + ulCrcFail + "<span class='ul-bler'>UL-BLER=" + ul_bler + "</span><span class='ul-bler-percent'>UL-BLER-percent=" + ul_bler_percent +
+                    "</span>UL-MCS=" + ulMcs +
                     "\n";
                 index++;
             }
 
             return output;
+        }
+
+        function downloadTxtFile(text) {
+            var blob = new Blob([text], {
+                type: 'text/plain'
+            });
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'output.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
         }
 
         function printToPDF() {
@@ -269,3 +285,4 @@ Parse “du_stats_XXX.txt” multi-UE (Each_Tput_Time) => https://dustinchen26.g
 </body>
 
 </html>
+
